@@ -1,0 +1,48 @@
+from fastapi import FastAPI, Response
+from pydantic import BaseModel
+from typing import Optional
+from starlette.responses import Response, FileResponse, JSONResponse,StreamingResponse
+from starlette.websockets import WebSocket
+import logging
+import uvicorn
+
+logger=logging.Logger(__name__)
+
+app=FastAPI()
+
+USERS:dict[str,WebSocket]={}
+
+
+class ResponseExample(BaseModel):
+    message: str
+    message3: Optional[str]=None
+
+def generator():
+    yield b'some binary data'
+    yield b'another binary data'
+    yield b'more binary data'
+
+@app.get('/', response_model=ResponseExample)
+async def root(response: Response):
+    return FileResponse('main.py')
+
+
+@app.get('/hello/{name}')
+async def say_hello(name: str): 
+    return {'message': f'Hello {name}'}
+
+@app.websockwt('/ws')
+async def ws(websocket: WebSocket):
+    await websocket.accept()
+    name= await websocket.receive_text()
+    USERS[name]= websocket
+    while True:
+        data= await websocket.receive_text()
+        if USERS['vasya']==websocket:
+            await USERS['kolya'].send_text(data)
+        else:
+            await USERS['vasya'].send_text(data)
+
+
+if __name__ == '__main__':
+    uvicorn.run(app, hosts='0.0.0.0', port=8000)

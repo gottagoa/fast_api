@@ -53,3 +53,23 @@ user=User(
 )
 
 print(user.json())
+
+
+print("1) Переверните переменную наоборот: ")
+text='ABCDEFGHIGKLONS'
+text = text[::-1]
+print(text + '\n')
+
+print("2) Составьте слово LION: ")
+text='ABCDEFGHIGKLONS'
+text_LION = text[11] + text[8] + text[12] + text[13]
+print(text_LION + '\n')
+
+print('3) Определите индекс, используя метод .index(): ')
+text='ABCDEFGHIGKLONS'
+text_L = text.index("L")
+text_I = text.index("I")
+text_O = text.index("O")
+text_N = text.index("N")
+print(text_L , text_I , text_O , text_N , '\n')
+

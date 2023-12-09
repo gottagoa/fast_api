@@ -2,8 +2,8 @@ from fastapi import FastAPI
 from fastapi import APIRouter
 from pydantic import BaseModel
 from typing import Optional
-from .users import User
-from .users import user_router
+from ...users import User
+from ...users import user_router
 
 app=FastAPI()
 

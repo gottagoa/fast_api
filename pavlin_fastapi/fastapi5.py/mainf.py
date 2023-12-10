@@ -1,13 +1,15 @@
-from fastapi import FastAPI, Response, Depends
+from fastapi import FastAPI, Response, Depends, HTTPException
 from pydantic import BaseModel
 from typing import Optional
 from starlette.responses import Response, FileResponse, JSONResponse,StreamingResponse
 from starlette.websockets import WebSocket
+from starlette.background import BackgroundTasks
 import logging
 import uvicorn
 from datetime import datetime
 import httpx
-import requests
+from httpx import Request
+import asyncio
 
 
 logger=logging.Logger(__name__)
@@ -19,6 +21,12 @@ def paginate(limit: Optional[int]=10, offset: Optional[int] =0)-> dict:
         'limit':limit,
         'offset':offset,
     }
+
+def auth_user(token: str):
+    pass
+
+async def very_slow_function():
+    await asyncio.sleep(10)
 
 
 @app.get('/users')
@@ -60,6 +68,22 @@ async def add_process_time_header(request: Request, call_next):
     response= await call_next(request)
     response.headers['X-Process-Time']=str(datetime.now()-now())
     return response
+
+
+@app.on_event('startup')
+async def startup_event():
+    print('startup')
+
+@app.on_event('shutdown')
+async def shutdown_event():
+    print('shutdown')
+
+
+@app.get('/slow-function')
+async def slow_functiom(background_tasks: BackgroundTasks):
+    await very_slow_function()
+    return {'message':'Hello world!'}
+
 
 if __name__ == '__main__':
     uvicorn.run(app, hosts='0.0.0.0', port=8000)
